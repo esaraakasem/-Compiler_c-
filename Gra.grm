@@ -1,0 +1,92 @@
+﻿"Name"     = 'Enter the name of the grammar'
+"Author"   = 'Enter your name'
+"Version"  = 'The version of the grammar and/or language'
+"About"    = 'A short description of the grammar'
+
+"Start Symbol" = <Start>
+
+! -------------------------------------------------
+! Character Sets
+! -------------------------------------------------
+
+{WS}           = {Whitespace} - {CR} - {LF}
+{String Chars} = {Printable} + {HT} - ["]
+
+! -------------------------------------------------
+! Terminals
+! -------------------------------------------------
+
+! The following defines the Whitespace terminal using the {WS}
+! set - which excludes the carriage return and line feed 
+! characters
+
+Whitespace    = {WS}+
+NewLine       = {CR}{LF} | {CR} | {LF}
+
+Identifier    = {Letter}{AlphaNumeric}*
+StringLiteral = '"' {String Chars}* '"'
+
+! -------------------------------------------------
+! Rules
+! -------------------------------------------------
+
+! The following rule defines a series of newline tokens.
+! Use this rule rather than the newline terminal.
+
+<nl>     ::= NewLine <nl>          !One or more
+          |  NewLine
+
+<nl Opt> ::= NewLine <nl Opt>      !Zero or more
+          |  !Empty
+
+! <nl opt> removes blank lines before first statement
+
+<Start>   ::= <nl opt> <Program>
+
+<Program> ::= 
+<Num> ::= 0|1|2|3|4|5|6|7|8|9
+<Char> ::= a|b|z 
+!<line>::= <type><Var>=<Expression>
+
+<Var>::= <Char>|<Char> <Mix>
+<Mix> ::= <Num>|<Char>|<Num> <Mix> | <Char> <Mix>
+<Int> ::= <Num> | <Num> <Int>
+<float>::= <Int>|<Int>'.'<Int>
+
+<type> ::= <Int> | <char> | <float> | 'var'
+
+<Expression>  ::= <Expression> '+' <Mult Exp> 
+               |  <Expression> '-' <Mult Exp> 
+               |  <Mult Exp> 
+
+<Mult Exp>    ::= <Mult Exp> '*' <Negate Exp> 
+               |  <Mult Exp> '/' <Negate Exp> 
+               |  <Mult Exp> '<' <Negate Exp> 
+               |  <Mult Exp> '>' <Negate Exp> 
+               |  <Negate Exp> 
+
+<Value>       ::= Identifier            
+               |  '(' <Expression> ')'
+<Negate Exp>  ::= '-' <Value> 
+               |  <Value> 
+!if statment
+<if-stmt> ::= 'if' <logical-Expr> 'then' <stmt>| ' if' <logical-Expr>' then' <stmt>' else' <stmt>
+         
+<logical-Expr>::= <Char>
+<stmt> ::= <Expression> |<Expression> <if-stmt>
+
+!switch 
+<stmt-list>::= <Expression> 
+ <switch-stmt> ::= 'Switch' '('<Expression>')''{case' <var> 'then'  <stmt-list> '{''case' <var> 'then'  <stmt-list>'}'| '[default' <stmt-list>']' '}'
+
+! Loop
+<for-stmt> ::= 'for' '(' <var>'='<Num> ';'<expr-Condtion>';'<expr-op>')'         
+!do while loop
+<Do>::='do''begin'<code>'while''{'<Expression>'}''endDo'
+<code>::='('')'
+        |'{'<stmt-list>'}'
+
+<expr-Condtion> ::= <Expression> 
+<expr-op> ::=<Expression> 
+!Add more values to the rule below - as needed
+
